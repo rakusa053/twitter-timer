@@ -48,12 +48,12 @@ function decrementStock() {
   chrome.storage.local.get(['stock'], (result) => {
     const newStock = Math.max(0, (result.stock || 10) - 1);
     chrome.storage.local.set({ stock: newStock }, () => {
-      blockTwitter(false); // 通常の終了
+      blockTwitter(false, newStock); // 通常の終了
     });
   });
 }
 
-function blockTwitter(isOutOfStock) {
+function blockTwitter(isOutOfStock, remainingStock = 0) {
   if (document.getElementById("twitter-block")) return;
 
   const overlay = document.createElement("div");
@@ -63,9 +63,24 @@ function blockTwitter(isOutOfStock) {
     ? "今日のストックがなくなりました<br>また明日お会いしましょう 💤"
     : "1分経過しました<br>Twitterは終了です";
 
+  // ストックの図形表示を生成（10個のドット）
+  let stockDots = '';
+  for (let i = 0; i < 10; i++) {
+    const statusClass = i < remainingStock ? 'active' : 'used';
+    stockDots += `<div class="stock-dot ${statusClass}"></div>`;
+  }
+
   overlay.innerHTML = `
-    <div class="block-message">
-      ${isOutOfStock ? "🚫" : "⏰"} ${message}
+    <div class="block-content">
+      <div class="block-message">
+        ${isOutOfStock ? "🚫" : "⏰"} ${message}
+      </div>
+      <div class="stock-visualizer">
+        ${stockDots}
+      </div>
+      <div class="stock-text-small">
+        残りストック: ${remainingStock} / 10
+      </div>
     </div>
   `;
   document.body.appendChild(overlay);
