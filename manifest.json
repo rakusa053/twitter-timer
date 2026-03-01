@@ -3,7 +3,7 @@
   "name": "Twitter 1-Minute Timer",
   "version": "1.0",
   "description": "1分経つとTwitterをブロックする拡張",
-  "permissions": [],
+  "permissions": ["storage"],
   "content_scripts": [
     {
       "matches": [
